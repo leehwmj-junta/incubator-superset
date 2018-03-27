@@ -1505,12 +1505,55 @@ class Superset(BaseSupersetView):
 
             engine = create_engine(uri, connect_args=connect_args)
             engine.connect()
-            return json_success(json.dumps(engine.table_names(), indent=4))
+            # return json_success(json.dumps(engine.table_names(), indent=4))
+            # try:
+            #     jsonex = self.match_tables(engine)
+            # except:
+            #     return json_success(json.dumps(engine.table_names(), indent=4))
+            # else:
+            #     return json_success(json.dumps(jsonex, indent=4))
+            jsonex = self.match_tables(engine)
+            return json_success(json.dumps(jsonex, indent=4))
+
         except Exception as e:
             logging.exception(e)
             return json_error_response((
                 'Connection failed!\n\n'
                 'The error message returned was:\n{}').format(e))
+
+    def match_tables(self, engine):
+        dmt = "dash_management_tb"
+        re_name = "refinedata_name"
+        co_name = "collection_name"
+        get_columns_sql = "show columns from " + dmt
+        get_mg_tb_sql = "select " + re_name + ", " + co_name + " from "+ dmt
+
+        logging.info("----------------------------------------------oo")
+        logging.info(engine)
+        logging.info("----------------------------------------------oo")
+        got_columns = engine.execute(get_columns_sql)
+        ma_tb = engine.execute(get_mg_tb_sql)
+        management_map = {}
+        for row in ma_tb:
+            management_map[row[1]] = row[0]
+
+        got_columns = list(map(list,list(got_columns)))
+        collection_names = engine.table_names()
+        logging.info(got_columns)
+        logging.info(management_map)
+        logging.info(collection_names)
+
+        visiable_data = []
+        for i in collection_names:
+            if i in management_map:
+                visiable_data.append( management_map.get(i) )
+        logging.info(visiable_data)
+
+        # tb_info_mathing = {
+        #     "management_map" : management_map,
+        #     "collection_names" : collection_names}
+        # return tb_info_mathing
+        return visiable_data
 
     @api
     @has_access_api

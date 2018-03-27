@@ -35,6 +35,7 @@
         dataType: 'json',
         contentType: "application/json; charset=utf-8"
       }).done(function(data) {
+          console.log(data)
           alert("Seems OK!");
           if ($('#tables').length == 0)
             $('body div.container').append('<div id="tables"></div>');
