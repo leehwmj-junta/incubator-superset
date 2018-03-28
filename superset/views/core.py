@@ -1540,20 +1540,20 @@ class Superset(BaseSupersetView):
         got_columns = list(map(list,list(got_columns)))
         collection_names = engine.table_names()
         logging.info(got_columns)
-        logging.info(management_map)
-        logging.info(collection_names)
+        # logging.info(management_map)
+        # logging.info(collection_names)
 
-        visiable_data = []
+        visiable_dic = {}
         for i in collection_names:
             if i in management_map:
-                visiable_data.append( management_map.get(i) )
-        logging.info(visiable_data)
+                visiable_dic[i] = management_map.get(i)
+        logging.info(visiable_dic)
 
         # tb_info_mathing = {
         #     "management_map" : management_map,
         #     "collection_names" : collection_names}
         # return tb_info_mathing
-        return visiable_data
+        return visiable_dic
 
     @api
     @has_access_api
