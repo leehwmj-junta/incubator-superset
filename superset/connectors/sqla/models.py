@@ -171,6 +171,7 @@ class SqlaTable(Model, BaseDatasource):
     __table_args__ = (UniqueConstraint('database_id', 'table_name'),)
 
     table_name = Column(String(250))
+    # refined_table_name = Column(String(250), default="aaa", unique=True)
     main_dttm_col = Column(String(250))
     database_id = Column(Integer, ForeignKey('dbs.id'), nullable=False)
     fetch_values_predicate = Column(String(1000))

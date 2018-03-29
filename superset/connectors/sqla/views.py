@@ -7,6 +7,8 @@ from flask_babel import gettext as __
 from flask_babel import lazy_gettext as _
 from past.builtins import basestring
 
+import logging
+
 from superset import appbuilder, db, security, sm, utils
 from superset.connectors.base.views import DatasourceModelView
 from superset.utils import has_access
@@ -233,6 +235,12 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
                 models.SqlaTable.table_name == table.table_name,
                 models.SqlaTable.schema == table.schema,
                 models.SqlaTable.database_id == table.database.id)
+            logging.info("------------------------------------")
+            logging.info(models.SqlaTable)
+            logging.info(models.SqlaTable.table_name)
+            logging.info(table.table_name)
+            logging.info(table_query)
+            logging.info("------------------------------------")
             if db.session.query(table_query.exists()).scalar():
                 raise Exception(
                     get_datasource_exist_error_mgs(table.full_name))

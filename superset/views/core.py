@@ -260,6 +260,10 @@ class DatabaseView(SupersetModelView, DeleteMixin, YamlExportMixin):  # noqa
     }
 
     def pre_add(self, db):
+        logging.info("ooooooooooooooooooooooooooooooooooooooooooooo")
+        logging.info(dir(db))
+        logging.info(dir(self))
+        logging.info("ooooooooooooooooooooooooooooooooooooooooooooo")
         db.set_sqlalchemy_uri(db.sqlalchemy_uri)
         security.merge_perm(sm, 'database_access', db.perm)
         for schema in db.all_schema_names():
@@ -486,7 +490,7 @@ appbuilder.add_view(
     'Slices',
     label=__('Slices'),
     icon='fa-bar-chart',
-    category='',
+    category='AAA',
     category_icon='',)
 
 
@@ -1528,9 +1532,9 @@ class Superset(BaseSupersetView):
         get_columns_sql = "show columns from " + dmt
         get_mg_tb_sql = "select " + re_name + ", " + co_name + " from "+ dmt
 
-        logging.info("----------------------------------------------oo")
-        logging.info(engine)
-        logging.info("----------------------------------------------oo")
+        # logging.info("----------------------------------------------oo")
+        # logging.info(engine)
+        # logging.info("----------------------------------------------oo")
         got_columns = engine.execute(get_columns_sql)
         ma_tb = engine.execute(get_mg_tb_sql)
         management_map = {}
@@ -1539,7 +1543,7 @@ class Superset(BaseSupersetView):
 
         got_columns = list(map(list,list(got_columns)))
         collection_names = engine.table_names()
-        logging.info(got_columns)
+        # logging.info(got_columns)
         # logging.info(management_map)
         # logging.info(collection_names)
 
@@ -1547,7 +1551,7 @@ class Superset(BaseSupersetView):
         for i in collection_names:
             if i in management_map:
                 visiable_dic[i] = management_map.get(i)
-        logging.info(visiable_dic)
+        # logging.info(visiable_dic)
 
         # tb_info_mathing = {
         #     "management_map" : management_map,
