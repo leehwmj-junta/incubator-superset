@@ -171,19 +171,27 @@ class SqlaTable(Model, BaseDatasource):
     __table_args__ = (UniqueConstraint('database_id', 'table_name'),)
 
     table_name = Column(String(250))
-    # refined_table_name = Column(String(250), default="aaa", unique=True)
     main_dttm_col = Column(String(250))
     database_id = Column(Integer, ForeignKey('dbs.id'), nullable=False)
+    # database_uri = Column(String(1024), ForeignKey('dbs.sqlalchemy_uri'))
     fetch_values_predicate = Column(String(1000))
     user_id = Column(Integer, ForeignKey('ab_user.id'))
     owner = relationship(
         sm.user_model,
         backref='tables',
         foreign_keys=[user_id])
+    # database = relationship(
+    #     'Database',
+    #     backref=backref('tables', cascade='all, delete-orphan'),
+    #     foreign_keys=[database_uri])
     database = relationship(
         'Database',
         backref=backref('tables', cascade='all, delete-orphan'),
         foreign_keys=[database_id])
+    # sqlalchemy_uri = relationship(
+    #     'Database',
+    #     backref='tables',
+    #     foreign_keys=[database_uri])
     schema = Column(String(255))
     sql = Column(Text)
 

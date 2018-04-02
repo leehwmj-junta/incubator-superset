@@ -77,7 +77,7 @@ def upgrade():
     sa.Column('table_name', sa.String(length=250), nullable=True),
     sa.Column('main_dttm_col', sa.String(length=250), nullable=True),
     sa.Column('default_endpoint', sa.Text(), nullable=True),
-    sa.Column('database_id', sa.Integer(), sa.ForeignKey("dbs.id"), nullable=False),
+    sa.Column('database_id', sa.String(length= 1024), sa.ForeignKey("dbs.sqlalchemy_uri"), nullable=False),
     sa.Column('created_by_fk', sa.Integer(), sa.ForeignKey("ab_user.id"), nullable=True),
     sa.Column('changed_by_fk', sa.Integer(), sa.ForeignKey("ab_user.id"), nullable=True),
     sa.PrimaryKeyConstraint('id'),

@@ -260,10 +260,7 @@ class DatabaseView(SupersetModelView, DeleteMixin, YamlExportMixin):  # noqa
     }
 
     def pre_add(self, db):
-        logging.info("ooooooooooooooooooooooooooooooooooooooooooooo")
-        logging.info(dir(db))
-        logging.info(dir(self))
-        logging.info("ooooooooooooooooooooooooooooooooooooooooooooo")
+        logging.info("databaseview pre_add")
         db.set_sqlalchemy_uri(db.sqlalchemy_uri)
         security.merge_perm(sm, 'database_access', db.perm)
         for schema in db.all_schema_names():
@@ -1325,6 +1322,7 @@ class Superset(BaseSupersetView):
         return Response(
             json.dumps({'schemas': schemas}),
             mimetype='application/json')
+        # return json.dumps({'schemas': schemas})
 
     @api
     @has_access_api
@@ -1464,6 +1462,10 @@ class Superset(BaseSupersetView):
     def testconn(self):
         """Tests a sqla connection"""
         try:
+            logging.info(dir(self))
+            # logging.info(self.table(2, "sgvwyh03ig_0313012146", "junta"))
+            logging.info("---------------------------------")
+            logging.info(request.json.get('uri'))
             username = g.user.username if g.user is not None else None
             uri = request.json.get('uri')
             db_name = request.json.get('name')
@@ -1517,6 +1519,7 @@ class Superset(BaseSupersetView):
             # else:
             #     return json_success(json.dumps(jsonex, indent=4))
             jsonex = self.match_tables(engine)
+            logging.info(jsonex)
             return json_success(json.dumps(jsonex, indent=4))
 
         except Exception as e:
