@@ -169,6 +169,7 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
         'description', 'owner',
         'main_dttm_col', 'default_endpoint', 'offset', 'cache_timeout']
     show_columns = edit_columns + ['perm']
+    add_template = "appbuilder/general/model/add.html"
     related_views = [TableColumnInlineView, SqlMetricInlineView]
     base_order = ('changed_on', 'desc')
     search_columns = (
@@ -235,12 +236,6 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
                 models.SqlaTable.table_name == table.table_name,
                 models.SqlaTable.schema == table.schema,
                 models.SqlaTable.database_id == table.database.id)
-            logging.info("------------------------------------")
-            logging.info(models.SqlaTable)
-            logging.info(models.SqlaTable.table_name)
-            logging.info(table.table_name)
-            logging.info(table_query)
-            logging.info("------------------------------------")
             if db.session.query(table_query.exists()).scalar():
                 raise Exception(
                     get_datasource_exist_error_mgs(table.full_name))
