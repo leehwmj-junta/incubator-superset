@@ -163,7 +163,8 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
         'link', 'database',
         'changed_by_', 'modified']
     order_columns = ['modified']
-    add_columns = ['database', 'schema']
+    add_columns = ['database', 'schema','table_name']
+
     edit_columns = [
         'table_name', 'sql', 'filter_select_enabled', 'slices',
         'fetch_values_predicate', 'database', 'schema',
@@ -239,7 +240,8 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
                 models.SqlaTable.database_id == table.database.id)
             logging.info('----------------------------------------------')
             table.get_uri()
-            logging.info(table)
+            logging.info(dir(table))
+            # logging.info(dir(self))
             logging.info(table.table_name)
             logging.info(table.schema)
             logging.info(table.database.id)

@@ -4,12 +4,13 @@
 
 {% block tail_js %}
   {{ super() }}
-  {{ macros.testconn() }}
+ {# {{ macros.testconn() }} #}
+
 {% endblock %}
 
 {% block add_form %}
 {{ super() }}
-<script>
+<!-- <script>
     var data1 = [
         "table1",
         "table2",
@@ -26,9 +27,9 @@
     ]
     
 
-</script>
+</script> -->
 
-<table>
+<!-- <table>
     <tr>
         <td>
             <select id="test1" class="testtableslist" style="margin-bottom: 20px; width:200px;"></select>
@@ -36,20 +37,30 @@
     </tr>
     <tr>
         <td>
-            <select style="width:200px" id="test2" class="testtableslist" name="states[]" multiple="multiple"
+            <select style="width:200px" id="test2" class="testtableslist" name="states[]" multiple="multiple"></select>
         </td>
     </tr>
 </table>
-<div style="height: 200px;"></div>
+<div style="height: 200px;"></div> -->
 
 <script>
     // console.log($("#table_name").parent().parent().parent())
-    var select_tables = "<select class='select_tables' style='width:240px;'></input>"
+    $('#table_name').parent().parent().attr("style", "display:none;")
+    var select_tables = "<select class='select_tables' placeholder='Table Name' id='table_name' name='table_name' multiple='multiple' style='width:240px;'></select>"
     console.log($("#schema").closest("tbody").append("<tr><td class='col-lg-2'><label for='table_name' control-label> Table Name</label></td><td>"+ select_tables +"</td></tr>"))
+
+    $('.btn-primary').attr("id", "btn-save")
+    //$('#btn-save').attr("style", "display:none;")
+    $('#btn-save').before('<div id="fake-save" class="btn btn-sm btn-primary">SSS <i class="fa fa-save"></i></div>')
+    $('#fake-save').mouseover(function(e){
+        console.log(e)
+    })
 </script>
 
 
 <script>
+
+    var selected_table_list = {};
     
     $(document).ready(function() {
         var csrf_token = "{{ csrf_token() if csrf_token else '' }}";
@@ -61,6 +72,7 @@
             }
           }
         });
+        console.log(csrf_token)
 
         var data = {};
         var database_list;
@@ -81,40 +93,36 @@
           })
 
         
-        for (i in data1){
-            $(".testtableslist").append("<option class= value='"+ i +"'>"+ data1[i] +"</option>")
+        //for (i in data1){
+        //    $(".testtableslist").append("<option class= value='"+ i +"'>"+ data1[i] +"</option>")
             // console.log(data1[i])
-        }
+        //}
 
 
         // console.log($("#table_name").select2())
 
-        $('.js-example-basic-single').select2();
-        $('.testtableslist').select2();
-        $('.select_tables').select2();
-       
-        $('.js-example-basic-single').on('select2-open',function(){
-            console.log("open")
-        });
-        $('.js-example-basic-single').on('select2-selecting',function(){
-            console.log("select")
-        });
+        //$('.testtableslist').select2();
+        var table_list
+        
 
+        $('.select_tables').select2();
+        $('.select_tables').on('select2-selecting', function(e){
+            console.log(e)
+            selected_table_list[e.object.id] = e.object.text
+            console.log(selected_table_list)
+            //$('#table_name').attr("value", e.object.id)
+        })
 
         $('.my_select2').on('select2-selecting', function(e){
 
-            console.log($('#s2id_autogen3'))
+            //console.log($('#s2id_autogen3'))
             //$('.table_name').detach()
 
-            e.preventDefault();
+            selected_db_name = e.object.text
+            //console.log(database_list[selected_db_name])
 
-            var table_list
-
-            seleced_db_name = e.object.text
-            console.log(database_list[seleced_db_name])
-
-            console.log(e.object.text)
-            console.log("db selecting")
+            //console.log(e.object.text)
+            //console.log("db selecting")
 
             var csrf_token = "{{ csrf_token() if csrf_token else '' }}";
             $.ajaxSetup({
@@ -124,12 +132,13 @@
                   }
                 }
             });
+            //console.log(csrf_token)
 
             var data_testconn = {};
             try{
             data_testconn = JSON.stringify({
-                uri: database_list[seleced_db_name],
-                name: seleced_db_name,
+                uri: database_list[selected_db_name],
+                name: selected_db_name,
                 // impersonate_user: $('#impersonate_user').is(':checked'),
                 // extras: JSON.parse($("#extra").val()),
             })
@@ -146,12 +155,14 @@
                 contentType: "application/json; charset=utf-8"
               }).done(function(data) {
                   console.log(data)
+
                   //alert("Seems OK!");
 
                   for (i in data){
                     $(".select_tables").append("<option style='display: none;' class=table_name value='"+ i +"'>"+ data[i] +"</option>")
+                    
                     // console.log(data1[i])
-                }
+                  }
 
                   if ($('#tables').length == 0)
                     $('body div.container').append('<div id="tables"></div>');
@@ -172,6 +183,8 @@
               });
 
         });
+
+
     });
 </script>
 {% endblock %}
