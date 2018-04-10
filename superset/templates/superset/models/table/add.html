@@ -1,7 +1,177 @@
 {% extends "appbuilder/general/model/add.html" %}
 
 {% import "superset/models/table/macros.html" as macros %}
+
 {% block tail_js %}
   {{ super() }}
   {{ macros.testconn() }}
+{% endblock %}
+
+{% block add_form %}
+{{ super() }}
+<script>
+    var data1 = [
+        "table1",
+        "table2",
+        "table3",
+        "table4",
+        "table5",
+        "table6",
+        "table7",
+        "table8",
+        "table9",
+        "table10",
+        "table11",
+        "table12"
+    ]
+    
+
+</script>
+
+<table>
+    <tr>
+        <td>
+            <select id="test1" class="testtableslist" style="margin-bottom: 20px; width:200px;"></select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <select style="width:200px" id="test2" class="testtableslist" name="states[]" multiple="multiple"
+        </td>
+    </tr>
+</table>
+<div style="height: 200px;"></div>
+
+<script>
+    // console.log($("#table_name").parent().parent().parent())
+    var select_tables = "<select class='select_tables' style='width:240px;'></input>"
+    console.log($("#schema").closest("tbody").append("<tr><td class='col-lg-2'><label for='table_name' control-label> Table Name</label></td><td>"+ select_tables +"</td></tr>"))
+</script>
+
+
+<script>
+    
+    $(document).ready(function() {
+        var csrf_token = "{{ csrf_token() if csrf_token else '' }}";
+
+        $.ajaxSetup({
+          beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+          }
+        });
+
+        var data = {};
+        var database_list;
+
+        data = JSON.stringify({
+            name: $('#database').val()
+        })
+
+        $.ajax({
+            method: "POST",
+            url: "/superset/geturii",
+            data: data,
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8"
+          }).done(function(data) {
+              database_list = data
+              console.log(database_list)
+          })
+
+        
+        for (i in data1){
+            $(".testtableslist").append("<option class= value='"+ i +"'>"+ data1[i] +"</option>")
+            // console.log(data1[i])
+        }
+
+
+        // console.log($("#table_name").select2())
+
+        $('.js-example-basic-single').select2();
+        $('.testtableslist').select2();
+        $('.select_tables').select2();
+       
+        $('.js-example-basic-single').on('select2-open',function(){
+            console.log("open")
+        });
+        $('.js-example-basic-single').on('select2-selecting',function(){
+            console.log("select")
+        });
+
+
+        $('.my_select2').on('select2-selecting', function(e){
+
+            console.log($('#s2id_autogen3'))
+            //$('.table_name').detach()
+
+            e.preventDefault();
+
+            var table_list
+
+            seleced_db_name = e.object.text
+            console.log(database_list[seleced_db_name])
+
+            console.log(e.object.text)
+            console.log("db selecting")
+
+            var csrf_token = "{{ csrf_token() if csrf_token else '' }}";
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                  if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                  }
+                }
+            });
+
+            var data_testconn = {};
+            try{
+            data_testconn = JSON.stringify({
+                uri: database_list[seleced_db_name],
+                name: seleced_db_name,
+                // impersonate_user: $('#impersonate_user').is(':checked'),
+                // extras: JSON.parse($("#extra").val()),
+            })
+            } catch(parse_error){
+              alert("Malformed JSON in the extras field: " + parse_error);
+              return false
+            }
+
+            $.ajax({
+                method: "POST",
+                url: "/superset/testconn",
+                data: data_testconn,
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8"
+              }).done(function(data) {
+                  console.log(data)
+                  //alert("Seems OK!");
+
+                  for (i in data){
+                    $(".select_tables").append("<option style='display: none;' class=table_name value='"+ i +"'>"+ data[i] +"</option>")
+                    // console.log(data1[i])
+                }
+
+                  if ($('#tables').length == 0)
+                    $('body div.container').append('<div id="tables"></div>');
+                  div = $('#tables')
+                  div.html('Tables:<br>');
+                  $.each(data, function(i, d){
+                    var id = 'tbl_' + i;
+                    div.append('<span id="' + id + '" style="margin: 0px 10px 10px 0px;" class="btn btn-default">' + d + '</span>')
+                    $('#' + id).click(function(){window.location = '/tablemodelview/add';})
+                  });
+              }).fail(function(error) {
+                  var respJSON = error.responseJSON;
+                  var errorMsg = error.responseText;
+                  if (respJSON && respJSON.message) {
+                      errorMsg = respJSON.message;
+                  }
+                  alert("ERROR: " + errorMsg);
+              });
+
+        });
+    });
+</script>
 {% endblock %}

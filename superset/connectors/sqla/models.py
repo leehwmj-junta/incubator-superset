@@ -10,7 +10,7 @@ import six
 import sqlalchemy as sa
 from sqlalchemy import (
     and_, asc, Boolean, Column, DateTime, desc, ForeignKey, Integer, or_,
-    select, String, Text,
+    select, String, Text, Table
 )
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.schema import UniqueConstraint
@@ -173,25 +173,16 @@ class SqlaTable(Model, BaseDatasource):
     table_name = Column(String(250))
     main_dttm_col = Column(String(250))
     database_id = Column(Integer, ForeignKey('dbs.id'), nullable=False)
-    # database_uri = Column(String(1024), ForeignKey('dbs.sqlalchemy_uri'))
     fetch_values_predicate = Column(String(1000))
     user_id = Column(Integer, ForeignKey('ab_user.id'))
     owner = relationship(
         sm.user_model,
         backref='tables',
         foreign_keys=[user_id])
-    # database = relationship(
-    #     'Database',
-    #     backref=backref('tables', cascade='all, delete-orphan'),
-    #     foreign_keys=[database_uri])
     database = relationship(
         'Database',
         backref=backref('tables', cascade='all, delete-orphan'),
         foreign_keys=[database_id])
-    # sqlalchemy_uri = relationship(
-    #     'Database',
-    #     backref='tables',
-    #     foreign_keys=[database_uri])
     schema = Column(String(255))
     sql = Column(Text)
 
@@ -225,6 +216,13 @@ class SqlaTable(Model, BaseDatasource):
     def schema_perm(self):
         """Returns schema permission if present, database one otherwise."""
         return utils.get_schema_perm(self.database, self.schema)
+
+    def get_uri(self):
+        logging.info('#############################')
+        # logging.info(dir(self.database))
+        # logging.info(self.database.uri())
+        uri = self.database.uri()
+        return uri
 
     def get_perm(self):
         return (

@@ -1456,15 +1456,40 @@ class Superset(BaseSupersetView):
         session.close()
         return 'SLICES ADDED'
 
+    # @api
+    @has_access_api
+    @expose('/geturii', methods=['POST', 'GET'])
+    def geturii(self):
+        # logging.info(dir(self))
+        logging.info(self)
+        logging.info(db)
+        logging.info( list(db.session.execute("select database_name, sqlalchemy_uri from dbs")) )
+        
+        executed_uri = db.session.execute("select database_name, sqlalchemy_uri from dbs")
+
+        db_uri_map = {}
+        for row in executed_uri:
+            db_uri_map[row[0]] = row[1]
+
+        logging.info(db_uri_map)
+        # uri = models.Database
+        # logging.info(dir(SqlaTable))
+        # logging.info("--------------dd---------")
+        # logging.info(dir(models.Database))
+        # logging.info(type(models.Database.sqlalchemy_uri))
+        # logging.info(SqlaTable.get_uri(SqlaTable))
+        # logging.info(SqlaTable.get_uri(SqlaTable))
+        return json_success(json.dumps(db_uri_map, indent=4))
+
     @api
     @has_access_api
     @expose('/testconn', methods=['POST', 'GET'])
     def testconn(self):
         """Tests a sqla connection"""
         try:
-            logging.info(dir(self))
+            # logging.info(dir(self))
             # logging.info(self.table(2, "sgvwyh03ig_0313012146", "junta"))
-            logging.info("---------------------------------")
+            logging.info("--------------------------------")
             logging.info(request.json.get('uri'))
             username = g.user.username if g.user is not None else None
             uri = request.json.get('uri')
@@ -1512,15 +1537,15 @@ class Superset(BaseSupersetView):
             engine = create_engine(uri, connect_args=connect_args)
             engine.connect()
             # return json_success(json.dumps(engine.table_names(), indent=4))
-            # try:
-            #     jsonex = self.match_tables(engine)
-            # except:
-            #     return json_success(json.dumps(engine.table_names(), indent=4))
-            # else:
-            #     return json_success(json.dumps(jsonex, indent=4))
-            jsonex = self.match_tables(engine)
-            logging.info(jsonex)
-            return json_success(json.dumps(jsonex, indent=4))
+            try:
+                jsonex = self.match_tables(engine)
+            except:
+                return json_success(json.dumps(engine.table_names(), indent=4))
+            else:
+                return json_success(json.dumps(jsonex, indent=4))
+            # jsonex = self.match_tables(engine)
+            # logging.info(jsonex)
+            # return json_success(json.dumps(jsonex, indent=4))
 
         except Exception as e:
             logging.exception(e)

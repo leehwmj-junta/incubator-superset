@@ -17,6 +17,7 @@ from superset.views.base import (
     ListWidgetWithCheckboxes, SupersetModelView, YamlExportMixin,
 )
 from . import models
+from superset.models import core as core
 
 
 class TableColumnInlineView(CompactCRUDMixin, SupersetModelView):  # noqa
@@ -162,14 +163,14 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
         'link', 'database',
         'changed_by_', 'modified']
     order_columns = ['modified']
-    add_columns = ['database', 'schema', 'table_name']
+    add_columns = ['database', 'schema']
     edit_columns = [
         'table_name', 'sql', 'filter_select_enabled', 'slices',
         'fetch_values_predicate', 'database', 'schema',
         'description', 'owner',
         'main_dttm_col', 'default_endpoint', 'offset', 'cache_timeout']
     show_columns = edit_columns + ['perm']
-    add_template = "appbuilder/general/model/add.html"
+    add_template = "superset/models/table/add.html"
     related_views = [TableColumnInlineView, SqlMetricInlineView]
     base_order = ('changed_on', 'desc')
     search_columns = (
@@ -236,6 +237,14 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
                 models.SqlaTable.table_name == table.table_name,
                 models.SqlaTable.schema == table.schema,
                 models.SqlaTable.database_id == table.database.id)
+            logging.info('----------------------------------------------')
+            table.get_uri()
+            logging.info(table)
+            logging.info(table.table_name)
+            logging.info(table.schema)
+            logging.info(table.database.id)
+            logging.info('--------------------')
+
             if db.session.query(table_query.exists()).scalar():
                 raise Exception(
                     get_datasource_exist_error_mgs(table.full_name))

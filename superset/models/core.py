@@ -13,7 +13,7 @@ import pickle
 import textwrap
 
 from flask import escape, g, Markup, request
-from flask_appbuilder import Model
+from flask_appbuilder import Model, expose
 from flask_appbuilder.models.decorators import renders
 from future.standard_library import install_aliases
 import numpy
@@ -577,6 +577,10 @@ class Database(Model, AuditMixinNullable, ImportMixin):
     def __repr__(self):
         return self.verbose_name if self.verbose_name else self.database_name
 
+    # @property
+    def uri(self):
+        return self.sqlalchemy_uri
+
     @property
     def name(self):
         return self.verbose_name if self.verbose_name else self.database_name
@@ -644,7 +648,6 @@ class Database(Model, AuditMixinNullable, ImportMixin):
 
         masked_url = self.get_password_masked_url(url)
         logging.info('Database.get_sqla_engine(). Masked URL: {0}'.format(masked_url))
-
         params = extra.get('engine_params', {})
         if nullpool:
             params['poolclass'] = NullPool
@@ -660,6 +663,23 @@ class Database(Model, AuditMixinNullable, ImportMixin):
             params['connect_args'] = {'configuration': configuration}
 
         return create_engine(url, **params)
+
+    def get_sqla_url(self, schema=None, nullpool=False, user_name=None):
+        extra = self.get_extra()
+        url = make_url(self.sqlalchemy_uri_decrypted)
+        url = self.db_engine_spec.adjust_database_uri(url, schema)
+        effective_username = self.get_effective_user(url, user_name)
+        # If using MySQL or Presto for example, will set url.username
+        # If using Hive, will not do anything yet since that relies on a
+        # configuration parameter instead.
+        self.db_engine_spec.modify_url_for_impersonation(
+            url,
+            self.impersonate_user,
+            effective_username)
+
+        masked_url = self.get_password_masked_url(url)
+
+        return masked_url
 
     def get_reserved_words(self):
         return self.get_sqla_engine().dialect.preparer.reserved_words
