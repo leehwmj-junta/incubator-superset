@@ -10,57 +10,75 @@
 
 {% block add_form %}
 {{ super() }}
-<!-- <script>
-    var data1 = [
-        "table1",
-        "table2",
-        "table3",
-        "table4",
-        "table5",
-        "table6",
-        "table7",
-        "table8",
-        "table9",
-        "table10",
-        "table11",
-        "table12"
-    ]
-    
-
-</script> -->
-
-<!-- <table>
-    <tr>
-        <td>
-            <select id="test1" class="testtableslist" style="margin-bottom: 20px; width:200px;"></select>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <select style="width:200px" id="test2" class="testtableslist" name="states[]" multiple="multiple"></select>
-        </td>
-    </tr>
-</table>
-<div style="height: 200px;"></div> -->
 
 <script>
     // console.log($("#table_name").parent().parent().parent())
-    $('#table_name').parent().parent().attr("style", "display:none;")
+    //$('#table_name').parent().parent().attr("style", "display:none;")
+    //$('#table_name').attr('type', 'checkbox')
     var select_tables = "<select class='select_tables' placeholder='Table Name' id='table_name' name='table_name' multiple='multiple' style='width:240px;'></select>"
     console.log($("#schema").closest("tbody").append("<tr><td class='col-lg-2'><label for='table_name' control-label> Table Name</label></td><td>"+ select_tables +"</td></tr>"))
 
     $('.btn-primary').attr("id", "btn-save")
     //$('#btn-save').attr("style", "display:none;")
     $('#btn-save').before('<div id="fake-save" class="btn btn-sm btn-primary">SSS <i class="fa fa-save"></i></div>')
-    $('#fake-save').mouseover(function(e){
-        console.log(e)
+    //$('#fake-save').mouseover(function(e){
+    //    console.log(e)
+    //})
+
+    $('#fake-save').click(function(e){
+        //$('#table_name').text(selected_table_list)
+        //$('#btn-save').click()
+        
+        var selected_node_list = {};
+
+        var selected_node = $('.select2-search-choice')
+        console.log(selected_node)
+        console.log(got_tables_list)
+        selected_node.each(function(e){
+            //console.log($(this).text())
+            for(i in got_tables_list){
+                console.log(i)
+                console.log(got_tables_list[i])
+                console.log(String($(this).text().trim()))
+                got_tables_list[i] === String($(this).text().trim()) ? selected_node_list[i] = String($(this).text().trim()) : console.log("거짓")
+            }
+        })
+        console.log(selected_node_list)
+
+        var string_for_table_name_form = "";
+        var string_for_refined_name_form = "";
+        for (i in selected_node_list){
+            if (string_for_table_name_form == "" && string_for_refined_name_form == ""){
+                string_for_table_name_form += i
+                string_for_refined_name_form += selected_node_list[i]
+            } else {
+                string_for_table_name_form += "," + i
+                string_for_refined_name_form += "," + selected_node_list[i]
+            }
+            console.log(i)
+            console.log(selected_node_list[i])
+        }
+        $('#table_name').val(string_for_table_name_form)
+        $('#refined_name').val(string_for_refined_name_form)
+        //for(i in got_tables_list){
+        //    console.log(i)
+        //    console.log(got_tables_list[i])
+        //}
+
+        //for (i in $('.select2-search-choice')){
+        //    console.log(i)
+        //}
     })
+
+    //function get_key(object, list)
 </script>
 
 
 <script>
 
+    var database_list;
     var selected_table_list = {};
+    var got_tables_list;
     
     $(document).ready(function() {
         var csrf_token = "{{ csrf_token() if csrf_token else '' }}";
@@ -75,7 +93,7 @@
         console.log(csrf_token)
 
         var data = {};
-        var database_list;
+       
 
         data = JSON.stringify({
             name: $('#database').val()
@@ -99,24 +117,30 @@
         //}
 
 
+
+
+
         // console.log($("#table_name").select2())
 
         //$('.testtableslist').select2();
+        
+        //---------------------------table name select2--------------------------
         var table_list
         
-
         $('.select_tables').select2();
         $('.select_tables').on('select2-selecting', function(e){
             console.log(e)
-            selected_table_list[e.object.id] = e.object.text
-            console.log(selected_table_list)
-            //$('#table_name').attr("value", e.object.id)
+            //selected_table_list[e.object.id] = e.object.text
+            //console.log(selected_table_list)
+
+            //$('#table_name').val(e.object.id)
         })
+        //-----------------------------------------------------------------------
 
         $('.my_select2').on('select2-selecting', function(e){
 
             //console.log($('#s2id_autogen3'))
-            //$('.table_name').detach()
+            $('.table_name').detach()
 
             selected_db_name = e.object.text
             //console.log(database_list[selected_db_name])
@@ -154,13 +178,15 @@
                 dataType: 'json',
                 contentType: "application/json; charset=utf-8"
               }).done(function(data) {
-                  console.log(data)
-
+                  got_tables_list = data;
+                  console.log(got_tables_list)
                   //alert("Seems OK!");
 
                   for (i in data){
                     $(".select_tables").append("<option style='display: none;' class=table_name value='"+ i +"'>"+ data[i] +"</option>")
                     
+                    //$("#table_name").parent().prepend("<input type='checkbox' placeholder='Table Name' name='table_name' class='form-control' value='"+ i +"'>"+ data[i] +"</input></br>")
+
                     // console.log(data1[i])
                   }
 
