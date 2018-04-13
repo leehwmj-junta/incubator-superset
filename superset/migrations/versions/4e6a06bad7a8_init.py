@@ -75,6 +75,7 @@ def upgrade():
     sa.Column('changed_on', sa.DateTime(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('table_name', sa.String(length=250), nullable=True),
+    sa.Column('refined_name', sa.String(length=250)),
     sa.Column('main_dttm_col', sa.String(length=250), nullable=True),
     sa.Column('default_endpoint', sa.Text(), nullable=True),
     sa.Column('database_id', sa.Integer(), sa.ForeignKey("dbs.id"), nullable=False),

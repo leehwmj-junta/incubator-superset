@@ -160,10 +160,10 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
     edit_title = _('Edit Table')
 
     list_columns = [
-        'link', 'database',
+        'link', 'refined_name', 'database',
         'changed_by_', 'modified']
     order_columns = ['modified']
-    add_columns = ['database', 'schema','table_name']
+    add_columns = ['database', 'schema','table_name' ,'refined_name']
 
     edit_columns = [
         'table_name', 'sql', 'filter_select_enabled', 'slices',
@@ -233,23 +233,31 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
     }
 
     def pre_add(self, table):
-        with db.session.no_autoflush:
-            table_query = db.session.query(models.SqlaTable).filter(
-                models.SqlaTable.table_name == table.table_name,
-                models.SqlaTable.schema == table.schema,
-                models.SqlaTable.database_id == table.database.id)
-            logging.info('----------------------------------------------')
-            table.get_uri()
-            logging.info(dir(table))
-            # logging.info(dir(self))
-            logging.info(table.table_name)
-            logging.info(table.schema)
-            logging.info(table.database.id)
-            logging.info('--------------------')
+        logging.info('----------------------------------------------')
+        # table.get_uri()
+        logging.info(table.table_name)
+        logging.info(table.refined_name)
+        logging.info(table.schema)
+        logging.info(table.database.id)
+        logging.info('--------------------')
 
-            if db.session.query(table_query.exists()).scalar():
-                raise Exception(
-                    get_datasource_exist_error_mgs(table.full_name))
+        # table.table_name = table.table_name.split(',')
+        # table.refined_name = table.refined_name.split(',')
+        # logging.info(table.table_name)
+        # logging.info(table.refined_name)
+
+        for i in table.table_name:
+            with db.session.no_autoflush:
+                table_query = db.session.query(models.SqlaTable).filter(
+                    models.SqlaTable.table_name == table.table_name,
+                    # models.SqlaTable.table_name == i,
+                    models.SqlaTable.schema == table.schema,
+                    models.SqlaTable.database_id == table.database.id)
+                
+
+                if db.session.query(table_query.exists()).scalar():
+                    raise Exception(
+                        get_datasource_exist_error_mgs(table.full_name))
 
         # Fail before adding if the table can't be found
         if not table.database.has_table(table):

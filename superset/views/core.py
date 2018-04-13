@@ -469,11 +469,24 @@ class SliceModelView(SupersetModelView, DeleteMixin):  # noqa
     @expose('/add', methods=['GET', 'POST'])
     @has_access
     def add(self):
+        refined_map = []
         datasources = ConnectorRegistry.get_all_datasources(db.session)
+        logging.info("==========================")
+        refined_map = list(map(list,list(db.session.execute("select table_name, refined_name from tables"))))
+        logging.info( refined_map )
         datasources = [
             {'value': str(d.id) + '__' + d.type, 'label': repr(d)}
             for d in datasources
         ]
+        logging.info(datasources)
+        logging.info(datasources[0]['label'])
+
+        for i in refined_map:
+            if i[1] != None:
+                datasources[refined_map.index(i)]['label'] = i[1]
+            # logging.info(i)
+            # logging.info(refined_map.index(i))
+        logging.info(datasources)
         return self.render_template(
             'superset/add_slice.html',
             bootstrap_data=json.dumps({

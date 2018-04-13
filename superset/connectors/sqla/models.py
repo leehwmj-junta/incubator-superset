@@ -171,6 +171,9 @@ class SqlaTable(Model, BaseDatasource):
     __table_args__ = (UniqueConstraint('database_id', 'table_name'),)
 
     table_name = Column(String(250))
+
+    refined_name = Column(String(250))
+
     main_dttm_col = Column(String(250))
     database_id = Column(Integer, ForeignKey('dbs.id'), nullable=False)
     fetch_values_predicate = Column(String(1000))
@@ -191,7 +194,7 @@ class SqlaTable(Model, BaseDatasource):
     export_fields = (
         'table_name', 'main_dttm_col', 'description', 'default_endpoint',
         'database_id', 'offset', 'cache_timeout', 'schema',
-        'sql', 'params')
+        'sql', 'params', 'refined_name')
     export_parent = 'database'
     export_children = ['metrics', 'columns']
 

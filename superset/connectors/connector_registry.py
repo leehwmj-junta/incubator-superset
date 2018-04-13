@@ -1,4 +1,5 @@
 from sqlalchemy.orm import subqueryload
+import logging
 
 
 class ConnectorRegistry(object):
@@ -26,9 +27,39 @@ class ConnectorRegistry(object):
     @classmethod
     def get_all_datasources(cls, session):
         datasources = []
+
         for source_type in ConnectorRegistry.sources:
+            # logging.info(source_type)
+            # logging.info(ConnectorRegistry.sources[source_type])
+            # logging.info(session.query(ConnectorRegistry.sources[source_type]))
+            # logging.info(session.query(ConnectorRegistry.sources[source_type]).all())
+            # if source_type != "druid":
+            #     tbnames = list(map(list,list(session.execute("select table_name, refined_name from tables"))))
+            #     logging.info(tbnames)
+            #     refined_map_names = []
+            #     for i in tbnames:
+            #         # logging.info(i)
+            #         if i[1] != None:
+            #             refined_map_names.append(i[1])
+            #             # logging.info(i[1])
+            #         else:
+            #             refined_map_names.append(i[0])
+            #             # logging.info(i[0])
+            #     logging.info(refined_map_names)
+            #     logging.info(datasources)
+            #     datasources.extend(refined_map_names)
+            #     logging.info(datasources)
+            # else:
+            #     datasources.extend(
+            #         session.query(ConnectorRegistry.sources[source_type]).all())
+
+            # logging.info(session.query(ConnectorRegistry.sources[source_type]).all())
             datasources.extend(
                 session.query(ConnectorRegistry.sources[source_type]).all())
+        # logging.info("***************************")
+        # logging.info(ConnectorRegistry.sources)
+        # logging.info(datasources)
+        # logging.info( list(map(list,list(session.execute("select table_name, refined_name from tables")))) )
         return datasources
 
     @classmethod
