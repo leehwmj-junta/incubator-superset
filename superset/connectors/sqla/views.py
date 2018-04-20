@@ -233,24 +233,11 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
     }
 
     def pre_add(self, table):
-        logging.info('----------------------------------------------')
-        # table.get_uri()
-        logging.info(table.table_name)
-        logging.info(table.refined_name)
-        logging.info(table.schema)
-        logging.info(table.database.id)
-        logging.info('--------------------')
-
-        # table.table_name = table.table_name.split(',')
-        # table.refined_name = table.refined_name.split(',')
-        # logging.info(table.table_name)
-        # logging.info(table.refined_name)
 
         for i in table.table_name:
             with db.session.no_autoflush:
                 table_query = db.session.query(models.SqlaTable).filter(
                     models.SqlaTable.table_name == table.table_name,
-                    # models.SqlaTable.table_name == i,
                     models.SqlaTable.schema == table.schema,
                     models.SqlaTable.database_id == table.database.id)
                 

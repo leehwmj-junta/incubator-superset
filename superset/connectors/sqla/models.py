@@ -221,9 +221,6 @@ class SqlaTable(Model, BaseDatasource):
         return utils.get_schema_perm(self.database, self.schema)
 
     def get_uri(self):
-        logging.info('#############################')
-        # logging.info(dir(self.database))
-        # logging.info(self.database.uri())
         uri = self.database.uri()
         return uri
 
