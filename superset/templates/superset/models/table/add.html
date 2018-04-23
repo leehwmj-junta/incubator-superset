@@ -13,21 +13,22 @@
 
 <script>
     // console.log($("#table_name").parent().parent().parent())
-    //$('#table_name').parent().parent().attr("style", "display:none;")
+    $('#table_name').parent().parent().attr("style", "display:none;")
+    $('#refined_name').parent().parent().attr("style", "display:none;")
     //$('#table_name').attr('type', 'checkbox')
     var select_tables = "<select class='select_tables' placeholder='Table Name' id='table_name' name='table_name' multiple='multiple' style='width:240px;'></select>"
     console.log($("#schema").closest("tbody").append("<tr><td class='col-lg-2'><label for='table_name' control-label> Table Name</label></td><td>"+ select_tables +"</td></tr>"))
 
     $('.btn-primary').attr("id", "btn-save")
-    //$('#btn-save').attr("style", "display:none;")
-    $('#btn-save').before('<div id="fake-save" class="btn btn-sm btn-primary">SSS <i class="fa fa-save"></i></div>')
+    $('#btn-save').attr("style", "display:none;")
+    $('#btn-save').before('<div id="fake-save" class="btn btn-sm btn-primary">Save <i class="fa fa-save"></i></div>')
     //$('#fake-save').mouseover(function(e){
     //    console.log(e)
     //})
 
     $('#fake-save').click(function(e){
         //$('#table_name').text(selected_table_list)
-        //$('#btn-save').click()
+        
         
         var selected_node_list = {};
 
@@ -60,6 +61,8 @@
         }
         $('#table_name').val(string_for_table_name_form)
         $('#refined_name').val(string_for_refined_name_form)
+        $('#btn-save').click()
+        
         //for(i in got_tables_list){
         //    console.log(i)
         //    console.log(got_tables_list[i])
@@ -137,6 +140,7 @@
         })
         //-----------------------------------------------------------------------
 
+        //-----------------------db select & call tables-------------------------
         $('.my_select2').on('select2-selecting', function(e){
 
             //console.log($('#s2id_autogen3'))
