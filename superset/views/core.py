@@ -469,6 +469,7 @@ class SliceModelView(SupersetModelView, DeleteMixin):  # noqa
     @expose('/add', methods=['GET', 'POST'])
     @has_access
     def add(self):
+        # slice add page의 Choose a datasource에 table list를 mapping 하는 알고리즘
         refined_map = []
         datasources = ConnectorRegistry.get_all_datasources(db.session)
         logging.info("==========================")
@@ -500,7 +501,7 @@ appbuilder.add_view(
     'Slices',
     label=__('Slices'),
     icon='fa-bar-chart',
-    category='AAA',
+    category='',
     category_icon='',)
 
 
@@ -759,9 +760,15 @@ class Superset(BaseSupersetView):
     @expose('/datasources/')
     def datasources(self):
         datasources = ConnectorRegistry.get_all_datasources(db.session)
-        datasources = [o.short_data for o in datasources]
-        datasources = sorted(datasources, key=lambda o: o['name'])
-        return self.json_response(datasources)
+
+        datasources_list = []
+        for item in datasources:
+            source_dict = item.short_data
+            source_dict['refined_name'] = item.refined_name
+            datasources_list.append(source_dict)
+
+        datasources_list = sorted(datasources_list, key=lambda o: o['name'])
+        return self.json_response(datasources_list)
 
     @has_access_api
     @expose('/override_role_permissions/', methods=['POST'])
@@ -1088,6 +1095,7 @@ class Superset(BaseSupersetView):
     @has_access
     @expose('/explore/<datasource_type>/<datasource_id>/')
     def explore(self, datasource_type, datasource_id):
+        """ slice explore에 관련된 함수 """
         form_data = self.get_form_data()
 
         datasource_id = int(datasource_id)
@@ -1102,6 +1110,11 @@ class Superset(BaseSupersetView):
         error_redirect = '/slicemodelview/list/'
         datasource = ConnectorRegistry.get_datasource(
             datasource_type, datasource_id, db.session)
+        logging.info("=======================")
+        logging.info(datasource)
+        logging.info(datasource.refined_name)
+        logging.info("=======================")
+
         if not datasource:
             flash(DATASOURCE_MISSING_ERR, 'danger')
             return redirect(error_redirect)
@@ -1149,11 +1162,20 @@ class Superset(BaseSupersetView):
         merge_extra_filters(form_data)
 
         standalone = request.args.get('standalone') == 'true'
+
+        logging.info("datasource.datadatasource.datadatasource.datadatasource.datadatasource.datadatasource.data")
+        refined_map = db.session.execute("select table_name, refined_name from tables")
+        # logging.info( list(refined_map) )
+        management_map = {}
+        for row in refined_map:
+            management_map[row[0]] = row[1]
+
         bootstrap_data = {
             'can_add': slice_add_perm,
             'can_download': slice_download_perm,
             'can_overwrite': slice_overwrite_perm,
             'datasource': datasource.data,
+            'refined_name': datasource.refined_name,
             'form_data': form_data,
             'datasource_id': datasource_id,
             'datasource_type': datasource_type,
@@ -1163,6 +1185,20 @@ class Superset(BaseSupersetView):
             'forced_height': request.args.get('height'),
             'common': self.common_bootsrap_payload(),
         }
+
+        """ 읽기 전용인 bootstrap data """
+        logging.info(type(bootstrap_data))
+        bootstrap_data = json.dumps(bootstrap_data)
+        logging.info("=================================")
+        logging.info(type(bootstrap_data))
+        bootstrap_data = json.loads(bootstrap_data)
+        # ast.literal_eval(bootstrap_data)
+        logging.info(type(bootstrap_data))
+        logging.info(bootstrap_data['datasource']['name'])
+        if datasource.data['name'] in management_map:
+            bootstrap_data['datasource']['name'] = datasource.refined_name
+        logging.info(bootstrap_data['datasource']['name'])
+
         table_name = datasource.table_name \
             if datasource_type == 'table' \
             else datasource.datasource_name
@@ -1172,6 +1208,7 @@ class Superset(BaseSupersetView):
             title = '[explore] ' + table_name
         return self.render_template(
             'superset/basic.html',
+            # bootstrap_data=json.dumps(bootstrap_data),
             bootstrap_data=json.dumps(bootstrap_data),
             entry='explore',
             title=title,

@@ -91,6 +91,7 @@ slice_user = Table('slice_user', metadata,
 class Slice(Model, AuditMixinNullable, ImportMixin):
 
     """A slice is essentially a report or a view on data"""
+    """ 여기서 설정 된 모델은 superset/views/core.py의 SliceModelView class와 연결됨 """
 
     __tablename__ = 'slices'
     id = Column(Integer, primary_key=True)

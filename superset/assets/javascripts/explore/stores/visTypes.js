@@ -16,6 +16,8 @@ export const sections = {
     label: t('Datasource & Chart Type'),
     expanded: true,
     controlSetRows: [
+      // ['mapbox_color'],
+      // ['refined_name']
       ['datasource'],
       ['viz_type'],
       ['slice_id', 'cache_timeout'],

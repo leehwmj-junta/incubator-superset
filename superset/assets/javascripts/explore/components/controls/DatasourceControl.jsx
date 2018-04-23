@@ -58,7 +58,7 @@ export default class DatasourceControl extends React.PureComponent {
                 onClick={this.selectDatasource.bind(this, ds.uid)}
                 className="datasource-link"
               >
-                {ds.name}
+                {ds.refined_name ? ds.refined_name : ds.name}
               </a>),
             type: ds.type,
           }));
@@ -95,7 +95,7 @@ export default class DatasourceControl extends React.PureComponent {
             <Tooltip id={'error-tooltip'}>{t('Click to point to another datasource')}</Tooltip>
           }
         >
-          <Label onClick={this.toggleModal} style={{ cursor: 'pointer' }} className="m-r-5">
+          <Label onClick={this.toggleModal} style={{ cursor: 'pointer', whiteSpace: 'pre-wrap' }} className="m-r-5">
             {this.props.datasource.name}
           </Label>
         </OverlayTrigger>
