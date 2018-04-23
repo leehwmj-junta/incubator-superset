@@ -216,6 +216,13 @@ class SqlaTable(Model, BaseDatasource):
             '<a href="{self.explore_url}">{name}</a>'.format(**locals()))
 
     @property
+    def refined_name_link(self):
+        name = escape(self.refined_name)
+        return Markup(
+            '<a href="{self.explore_url}">{name}</a>'.format( **locals() )
+        )
+
+    @property
     def schema_perm(self):
         """Returns schema permission if present, database one otherwise."""
         return utils.get_schema_perm(self.database, self.schema)

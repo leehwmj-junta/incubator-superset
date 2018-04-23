@@ -160,7 +160,7 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
     edit_title = _('Edit Table')
 
     list_columns = [
-        'link', 'refined_name', 'database',
+        'link', 'refined_name_link', 'database',
         'changed_by_', 'modified']
     order_columns = ['modified']
     add_columns = ['database', 'schema','table_name' ,'refined_name']
@@ -172,6 +172,7 @@ class TableModelView(DatasourceModelView, DeleteMixin, YamlExportMixin):  # noqa
         'main_dttm_col', 'default_endpoint', 'offset', 'cache_timeout']
     show_columns = edit_columns + ['perm']
     add_template = "superset/models/table/add.html"
+    list_template = 'superset/models/table/list.html'
     related_views = [TableColumnInlineView, SqlMetricInlineView]
     base_order = ('changed_on', 'desc')
     search_columns = (
