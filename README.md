@@ -5,9 +5,6 @@ Superset은 Superset의 메타 데이터베이스 안에 데이터베이스 커�
 그래서 superset은 연결 비밀번호를 암호화 하기위해 "cryptography"라는 Python 라이브러리를 사용한다.
 불행하게도 이 라이브러리는 OS 레벨에 종속적이다.
 
-You may want to attempt the next step
-("Superset installation and initialization") and come back to this step if
-you encounter an error.
 
 아래에 이어질 "Superset installation and initialization"을 시도 했는데, 에러 등이 발생하면
 이 단계로 돌아와서 확인 해 볼 수 있다.
