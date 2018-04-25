@@ -18,9 +18,6 @@ Superset은 Superset의 메타 데이터베이스 안에 데이터베이스 커�
 Making own build ("Superset installation and initialization")
 ---------------------
 
-For more advanced users, you may want to build Superset from sources. That
-would be the case if you fork the project to add features specific to
-your environment.::
 
 빌드를 위해서 0.22 branch를 checkout하고(차후에 branch 명 변경 예정), 아래의 과정을 수행 하면 된다.
 
