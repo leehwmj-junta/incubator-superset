@@ -1095,7 +1095,7 @@ class Superset(BaseSupersetView):
     @has_access
     @expose('/explore/<datasource_type>/<datasource_id>/')
     def explore(self, datasource_type, datasource_id):
-        """ slice explore에 관련된 함수 """
+        """ slice explore에 data를 보내는데에 관련된 함수 """
         form_data = self.get_form_data()
 
         datasource_id = int(datasource_id)
@@ -1110,10 +1110,6 @@ class Superset(BaseSupersetView):
         error_redirect = '/slicemodelview/list/'
         datasource = ConnectorRegistry.get_datasource(
             datasource_type, datasource_id, db.session)
-        logging.info("=======================")
-        logging.info(datasource)
-        logging.info(datasource.refined_name)
-        logging.info("=======================")
 
         if not datasource:
             flash(DATASOURCE_MISSING_ERR, 'danger')
@@ -1163,9 +1159,7 @@ class Superset(BaseSupersetView):
 
         standalone = request.args.get('standalone') == 'true'
 
-        logging.info("datasource.datadatasource.datadatasource.datadatasource.datadatasource.datadatasource.data")
         refined_map = db.session.execute("select table_name, refined_name from tables")
-        # logging.info( list(refined_map) )
         management_map = {}
         for row in refined_map:
             management_map[row[0]] = row[1]
@@ -1186,18 +1180,11 @@ class Superset(BaseSupersetView):
             'common': self.common_bootsrap_payload(),
         }
 
-        """ 읽기 전용인 bootstrap data """
-        logging.info(type(bootstrap_data))
+        """ 읽기 전용인 bootstrap data를 dumps로 string으로 바꾼 뒤, loads로 다시 dict화 해 줌 """
         bootstrap_data = json.dumps(bootstrap_data)
-        logging.info("=================================")
-        logging.info(type(bootstrap_data))
         bootstrap_data = json.loads(bootstrap_data)
-        # ast.literal_eval(bootstrap_data)
-        logging.info(type(bootstrap_data))
-        logging.info(bootstrap_data['datasource']['name'])
         if datasource.data['name'] in management_map:
             bootstrap_data['datasource']['name'] = datasource.refined_name
-        logging.info(bootstrap_data['datasource']['name'])
 
         table_name = datasource.table_name \
             if datasource_type == 'table' \
