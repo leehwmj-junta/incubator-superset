@@ -245,7 +245,7 @@ INTERVAL = 1
 BACKUP_COUNT = 30
 
 # Set this API key to enable Mapbox visualizations
-MAPBOX_API_KEY = ''
+MAPBOX_API_KEY = 'pk.eyJ1IjoiY2hhYmVzIiwiYSI6ImNqZzNnMTNnaDF3dzkzM3A5cnlzeXJpeWYifQ.PKQ-cqCxmXa9AvIjn1ozHQ'
 
 # Maximum number of rows returned in the SQL editor
 SQL_MAX_ROW = 1000000
