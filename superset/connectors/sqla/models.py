@@ -126,8 +126,12 @@ class SqlMetric(Model, BaseMetric):
     __tablename__ = 'sql_metrics'
     __table_args__ = (UniqueConstraint('table_id', 'metric_name'),)
     table_id = Column(Integer, ForeignKey('tables.id'))
+
+    # table = db.session.execute("SELECT CASE WHEN refined_name IS null THEN table_name ELSE refined_name END FROM tables")
+    # table = property(_get_table_name_conditionally)
     table = relationship(
         'SqlaTable',
+        # lazy=select(),
         backref=backref('metrics', cascade='all, delete-orphan'),
         foreign_keys=[table_id])
     expression = Column(Text)
@@ -136,6 +140,10 @@ class SqlMetric(Model, BaseMetric):
         'metric_name', 'verbose_name', 'metric_type', 'table_id', 'expression',
         'description', 'is_restricted', 'd3format')
     export_parent = 'table'
+
+    # @property
+    # def get_table_name_conditionally(self):
+    #     return db.session.execute("SELECT CASE WHEN refined_name IS null THEN table_name ELSE refined_name END FROM tables")
 
     @property
     def sqla_col(self):
@@ -211,7 +219,10 @@ class SqlaTable(Model, BaseDatasource):
 
     @property
     def link(self):
-        name = escape(self.name)
+        if self.refined_name:
+            name = escape(self.refined_name)
+        else:
+            name = escape(self.name)
         return Markup(
             '<a href="{self.explore_url}">{name}</a>'.format(**locals()))
 
