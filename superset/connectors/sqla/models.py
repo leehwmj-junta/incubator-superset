@@ -10,7 +10,7 @@ import six
 import sqlalchemy as sa
 from sqlalchemy import (
     and_, asc, Boolean, Column, DateTime, desc, ForeignKey, Integer, or_,
-    select, String, Text, Table
+    select, String, Text, Table, case
 )
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.schema import UniqueConstraint
@@ -122,16 +122,17 @@ class TableColumn(Model, BaseColumn):
 class SqlMetric(Model, BaseMetric):
 
     """ORM object for metrics, each table can have multiple metrics"""
-
     __tablename__ = 'sql_metrics'
     __table_args__ = (UniqueConstraint('table_id', 'metric_name'),)
     table_id = Column(Integer, ForeignKey('tables.id'))
 
-    # table = db.session.execute("SELECT CASE WHEN refined_name IS null THEN table_name ELSE refined_name END FROM tables")
+    # table_filterd = db.session.execute("SELECT CASE WHEN refined_name IS null THEN table_name ELSE refined_name END FROM tables")
     # table = property(_get_table_name_conditionally)
+
     table = relationship(
         'SqlaTable',
-        # lazy=select(),
+        # primaryjoin="and_(SqlaTable.refined_name==None, SqlMetric.table_id==SqlaTable.id)",
+        primaryjoin="case([(SqlaTable.refined_name==None, 'table_name')],else_='refined_name')",
         backref=backref('metrics', cascade='all, delete-orphan'),
         foreign_keys=[table_id])
     expression = Column(Text)
@@ -141,9 +142,10 @@ class SqlMetric(Model, BaseMetric):
         'description', 'is_restricted', 'd3format')
     export_parent = 'table'
 
-    # @property
-    # def get_table_name_conditionally(self):
-    #     return db.session.execute("SELECT CASE WHEN refined_name IS null THEN table_name ELSE refined_name END FROM tables")
+    # def get_table_filterd(self):
+    #     filterd_table = db.session.execute("SELECT CASE WHEN refined_name IS null THEN table_name ELSE refined_name END FROM tables")
+    #     list_filterd_table = list(map(list,list(filterd_table)))
+    #     return list_filterd_table
 
     @property
     def sqla_col(self):
@@ -181,6 +183,7 @@ class SqlaTable(Model, BaseDatasource):
     table_name = Column(String(250))
 
     refined_name = Column(String(250))
+    id = Column(Integer, primary_key=True)
 
     main_dttm_col = Column(String(250))
     database_id = Column(Integer, ForeignKey('dbs.id'), nullable=False)

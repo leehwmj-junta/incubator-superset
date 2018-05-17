@@ -144,6 +144,7 @@ class SqlMetricInlineView(CompactCRUDMixin, SupersetModelView):  # noqa
         # logging.info("===============")
         # logging.info(self.edit_widget)
         maked_table = db.session.execute("SELECT CASE WHEN refined_name IS null THEN table_name ELSE refined_name END FROM tables")
+        # maked_table = db.session.execute("SELECT * FROM tables WHERE CASE WHEN (refined_name == null) THEN table_name ELSE refined_name END")
         logging.info(list(maked_table))
         if metric.is_restricted:
             security.merge_perm(sm, 'metric_access', metric.get_perm())
