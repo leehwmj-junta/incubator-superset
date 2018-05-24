@@ -131,8 +131,6 @@ class SqlMetric(Model, BaseMetric):
 
     table = relationship(
         'SqlaTable',
-        # primaryjoin="and_(SqlaTable.refined_name==None, SqlMetric.table_id==SqlaTable.id)",
-        primaryjoin="case([(SqlaTable.refined_name==None, 'table_name')],else_='refined_name')",
         backref=backref('metrics', cascade='all, delete-orphan'),
         foreign_keys=[table_id])
     expression = Column(Text)
@@ -141,11 +139,6 @@ class SqlMetric(Model, BaseMetric):
         'metric_name', 'verbose_name', 'metric_type', 'table_id', 'expression',
         'description', 'is_restricted', 'd3format')
     export_parent = 'table'
-
-    # def get_table_filterd(self):
-    #     filterd_table = db.session.execute("SELECT CASE WHEN refined_name IS null THEN table_name ELSE refined_name END FROM tables")
-    #     list_filterd_table = list(map(list,list(filterd_table)))
-    #     return list_filterd_table
 
     @property
     def sqla_col(self):
