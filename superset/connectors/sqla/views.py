@@ -99,6 +99,10 @@ appbuilder.add_view_no_menu(TableColumnInlineView)
 
 class SqlMetricInlineView(CompactCRUDMixin, SupersetModelView):  # noqa
     datamodel = SQLAInterface(models.SqlMetric)
+    # logging.info("view log")
+    # logging.info(dir(models.SqlMetric))
+    # logging.info(models.SqlMetric)
+    # logging.info(models.SqlMetric.table)
 
     list_title = _('List Metrics')
     show_title = _('Show Metric')
@@ -109,6 +113,7 @@ class SqlMetricInlineView(CompactCRUDMixin, SupersetModelView):  # noqa
     edit_columns = [
         'metric_name', 'description', 'verbose_name', 'metric_type',
         'expression', 'table', 'd3format', 'is_restricted', 'warning_text']
+    edit_template = 'superset/models/database/edit.html'
     description_columns = {
         'expression': utils.markdown(
             'a valid SQL expression as supported by the underlying backend. '
@@ -125,7 +130,12 @@ class SqlMetricInlineView(CompactCRUDMixin, SupersetModelView):  # noqa
             'formats', True,
         ),
     }
-    add_columns = edit_columns
+
+    # add_columns = edit_columns
+
+    
+    # add_template = 'superset/models/metric/edit.html'
+
     page_size = 500
     label_columns = {
         'metric_name': _('Metric'),

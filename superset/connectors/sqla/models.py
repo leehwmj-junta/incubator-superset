@@ -128,7 +128,7 @@ class SqlMetric(Model, BaseMetric):
 
     # table_filterd = db.session.execute("SELECT CASE WHEN refined_name IS null THEN table_name ELSE refined_name END FROM tables")
     # table = property(_get_table_name_conditionally)
-
+    # table = (1,2,3,4,5)
     table = relationship(
         'SqlaTable',
         backref=backref('metrics', cascade='all, delete-orphan'),
@@ -139,6 +139,12 @@ class SqlMetric(Model, BaseMetric):
         'metric_name', 'verbose_name', 'metric_type', 'table_id', 'expression',
         'description', 'is_restricted', 'd3format')
     export_parent = 'table'
+
+    # logging.info("0624 test :".format(table))
+    # logging.info(type(table))
+    # logging.info(dir(table))
+    maked_table = db.session.execute("SELECT CASE WHEN refined_name IS null THEN table_name ELSE refined_name END, id FROM tables")
+    logging.info(list(maked_table))
 
     @property
     def sqla_col(self):
